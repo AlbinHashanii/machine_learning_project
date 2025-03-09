@@ -13,3 +13,15 @@ missing_values = missing_values[missing_values > 0]
 print("Missing values in columns:")
 print(missing_values)
 print()
+
+# Check for duplicate 
+duplicate_values = csv_data.duplicated().sum()
+
+print(f"Number of duplicate rows: {duplicate_values}")
+
+# Check value counts 
+categorical_columns = csv_data.select_dtypes(include=['object']).columns
+for column in categorical_columns:
+    print(f"Value counts for {column}:")
+    print(csv_data[column].value_counts())
+    print()
