@@ -1,6 +1,6 @@
 import pandas as pd
 
-csv_data = pd.read_csv("atk-investimet-tvsh.csv")
+csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
 # Printing the data types
 print("Data types for each field:")
