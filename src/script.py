@@ -25,6 +25,12 @@ adv_miss_check(csv_data)
 # Check for duplicate
 duplicate_values = csv_data.duplicated().sum()
 print(f"Number of duplicate rows: {duplicate_values}")
+print()
+
+#Count the total number of rows
+total_rows = csv_data.shape[0]
+print("Total number of rows:", total_rows)
+print()
 
 # Check value counts
 categorical_columns = csv_data.select_dtypes(include=['object']).columns
