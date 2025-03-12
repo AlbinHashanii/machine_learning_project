@@ -1,12 +1,7 @@
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import sns
 from imblearn.over_sampling import SMOTE
-from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
