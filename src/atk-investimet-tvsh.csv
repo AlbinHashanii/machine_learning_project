@@ -1,16 +1,4 @@
-"Viti
-","Muaji
-","Përshkrimi i Sektorit (Kryesor)
-","Statusi i Regjistrimit
-","Komuna
-","NNumri i Tatimpaguesve
-","Blerjet dhe importet investive pa TVSH
-","Blerjet dhe importet investive me TVSH jo të zbritshme
-","Importet investive me normë 18%
-","Importet investive me normë 8%
-","Blerjet investive vendore me normë 18%
-","Blerjet investive vendore me normë 8%
-"
+Viti,Muaji,Pershkrimi,Statusi,Komuna,Tatimpaguesit,Blerjet dhe importet investive pa TVSH,Blerjet dhe importet investive me TVSH jo te zbritshme,Importet investive me norme 18%,Importet investive me norme 8%,Blerjet investive vendore me norme 18%,Blerjet investive vendore me norme 8%
 2019,1,Administrimi publik dhe mbrojtja; Sigurimi social i detyrueshem,SH.P.K.,FERIZAJ,5,0,0,0,0,0,0
 2019,1,Administrimi publik dhe mbrojtja; Sigurimi social i detyrueshem,Individual,FUSHË KOSOVË,1,0,0,0,0,0,0
 2019,1,Administrimi publik dhe mbrojtja; Sigurimi social i detyrueshem,SH.P.K.,FUSHË KOSOVË,3,"4,000.00",0,0,0,0,0

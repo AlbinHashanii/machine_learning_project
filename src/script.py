@@ -1,4 +1,8 @@
 import pandas as pd
+import matplotlib.pyplot as plt
+from imblearn.over_sampling import SMOTE
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
@@ -38,3 +42,54 @@ for column in categorical_columns:
     print(f"Value counts for {column}:")
     print(csv_data[column].value_counts())
     print()
+
+# Categorical columns
+categorical_columns = ['Pershkrimi', 'Statusi', 'Komuna']
+
+label_encoders = {}
+for col in categorical_columns:
+    if col in csv_data.columns:
+        le = LabelEncoder()
+        csv_data[col] = le.fit_transform(csv_data[col])
+        label_encoders[col] = le
+    else:
+        print(f"Column '{col}' not found in the dataset. Please verify the column names.")
+
+target_column = 'Statusi'
+if target_column not in csv_data.columns:
+    raise ValueError(f"Target column '{target_column}' not found in the dataset.")
+
+X = csv_data.drop(columns=[target_column])
+y = csv_data[target_column]
+
+# Training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+smote = SMOTE(random_state=42)
+X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
+
+target_encoder = label_encoders[target_column]
+plt.figure(figsize=(12, 6))
+
+# Before SMOTE
+plt.subplot(1, 2, 1)
+counts_before = y_train.value_counts().sort_index()
+original_labels_before = target_encoder.inverse_transform(counts_before.index)
+plt.bar(original_labels_before, counts_before.values)
+plt.title("Class Distribution Before SMOTE")
+plt.xlabel("Target Classes")
+plt.ylabel("Count")
+plt.xticks(rotation=90)
+
+# After SMOTE
+plt.subplot(1, 2, 2)
+counts_after = y_train_res.value_counts().sort_index()
+original_labels_after = target_encoder.inverse_transform(counts_after.index)
+plt.bar(original_labels_after, counts_after.values)
+plt.title("Class Distribution After SMOTE")
+plt.xlabel("Target Classes")
+plt.ylabel("Count")
+plt.xticks(rotation=90)
+
+plt.tight_layout()
+plt.show()
