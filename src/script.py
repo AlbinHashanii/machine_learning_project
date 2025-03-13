@@ -86,12 +86,22 @@ for col in numerical_cols:
 print("Skewness of Numerical Columns:")
 print(skewness_values)
 
+# Apply Z-score method for outlier removal
+z_scores = csv_data[numerical_cols].apply(zscore, nan_policy='omit')
+threshold_z = 2
+
+outlier_indices = np.where(np.abs(z_scores) > threshold_z)[0]
+
+csv_data_no_outliers = csv_data.drop(outlier_indices)
+
+csv_data_no_outliers.to_csv("Investimet-2024-cleaned-no-outliers.csv", index=False)
+
 target_column = 'Statusi'
-if target_column not in csv_data.columns:
+if target_column not in csv_data_no_outliers.columns:
     raise ValueError(f"Target column '{target_column}' not found in the dataset.")
 
-X = csv_data.drop(columns=[target_column])
-y = csv_data[target_column]
+X = csv_data_no_outliers.drop(columns=[target_column])
+y = csv_data_no_outliers[target_column]
 
 # Training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
