@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
+from scipy.stats import skew, zscore
+import numpy as np
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
@@ -55,12 +57,51 @@ for col in categorical_columns:
     else:
         print(f"Column '{col}' not found in the dataset. Please verify the column names.")
 
+
+numerical_cols = [
+    "Viti", "Muaji", "Tatimpaguesit",
+    "Blerjet dhe importet investive pa TVSH",
+    "Blerjet dhe importet investive me TVSH jo te zbritshme",
+    "Importet investive me norme 18%",
+    "Importet investive me norme 8%",
+    "Blerjet investive vendore me norme 18%",
+    "Blerjet investive vendore me norme 8%"
+]
+
+# Calculate skewness
+skewness_values = csv_data[numerical_cols].apply(skew, nan_policy='omit')
+
+for col in numerical_cols:
+    plt.figure(figsize=(8, 5))
+    plt.hist(csv_data[col].dropna(), bins=30, color='skyblue', edgecolor='black', alpha=0.7)
+    plt.axvline(csv_data[col].mean(), color='red', linestyle='--', label='Mean')
+    plt.axvline(csv_data[col].median(), color='orange', linestyle='-', label='Median')
+    plt.title(f"Distribution of {col} with Skewness: {skew(csv_data[col], nan_policy='omit'):.2f}", fontsize=14)
+    plt.xlabel(col, fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+print("Skewness of Numerical Columns:")
+print(skewness_values)
+
+# Apply Z-score method for outlier removal
+z_scores = csv_data[numerical_cols].apply(zscore, nan_policy='omit')
+threshold_z = 2
+
+outlier_indices = np.where(np.abs(z_scores) > threshold_z)[0]
+
+csv_data_no_outliers = csv_data.drop(outlier_indices)
+
+csv_data_no_outliers.to_csv("Investimet-2024-cleaned-no-outliers.csv", index=False)
+
 target_column = 'Statusi'
-if target_column not in csv_data.columns:
+if target_column not in csv_data_no_outliers.columns:
     raise ValueError(f"Target column '{target_column}' not found in the dataset.")
 
-X = csv_data.drop(columns=[target_column])
-y = csv_data[target_column]
+X = csv_data_no_outliers.drop(columns=[target_column])
+y = csv_data_no_outliers[target_column]
 
 # Training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
