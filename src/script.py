@@ -96,6 +96,26 @@ csv_data_no_outliers = csv_data.drop(outlier_indices)
 
 csv_data_no_outliers.to_csv("Investimet-2024-cleaned-no-outliers.csv", index=False)
 
+
+# Visualization without Outliers
+print("Visualizing distributions without outliers:")
+skewness_values_no_outliers = csv_data_no_outliers[numerical_cols].apply(skew, nan_policy='omit')
+
+for col in numerical_cols:
+    plt.figure(figsize=(8, 5))
+    plt.hist(csv_data_no_outliers[col].dropna(), bins=30, color='skyblue', edgecolor='black', alpha=0.7)
+    plt.axvline(csv_data_no_outliers[col].mean(), color='red', linestyle='--', label='Mean')
+    plt.axvline(csv_data_no_outliers[col].median(), color='orange', linestyle='-', label='Median')
+    plt.title(f"Distribution of {col} without Outliers\nSkewness: {skew(csv_data_no_outliers[col], nan_policy='omit'):.2f}", fontsize=14)
+    plt.xlabel(col, fontsize=12)
+    plt.ylabel("Frequency", fontsize=12)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.show()
+
+print("Skewness of Numerical Columns without Outliers:")
+print(skewness_values_no_outliers)
+
 target_column = 'Statusi'
 if target_column not in csv_data_no_outliers.columns:
     raise ValueError(f"Target column '{target_column}' not found in the dataset.")
