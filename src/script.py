@@ -38,6 +38,26 @@ total_rows = csv_data.shape[0]
 print("Total number of rows:", total_rows)
 print()
 
+numerical_cols = [
+    "Viti", "Muaji", "Tatimpaguesit",
+    "Blerjet dhe importet investive pa TVSH",
+    "Blerjet dhe importet investive me TVSH jo te zbritshme",
+    "Importet investive me norme 18%",
+    "Importet investive me norme 8%",
+    "Blerjet investive vendore me norme 18%",
+    "Blerjet investive vendore me norme 8%"
+]
+
+# Aggregate numerical data
+aggregated_data = csv_data[numerical_cols].agg(['mean', 'median', 'sum', 'std', 'count'])
+print("Aggregated Data:")
+print(aggregated_data)
+
+# Sample 10% of the dataset randomly
+csv_data_sampled = csv_data.sample(frac=0.1)
+
+print(f"Sampled Data Shape: {csv_data_sampled.shape}")
+
 # Check value counts
 categorical_columns = csv_data.select_dtypes(include=['object']).columns
 for column in categorical_columns:
@@ -58,15 +78,6 @@ for col in categorical_columns:
         print(f"Column '{col}' not found in the dataset. Please verify the column names.")
 
 
-numerical_cols = [
-    "Viti", "Muaji", "Tatimpaguesit",
-    "Blerjet dhe importet investive pa TVSH",
-    "Blerjet dhe importet investive me TVSH jo te zbritshme",
-    "Importet investive me norme 18%",
-    "Importet investive me norme 8%",
-    "Blerjet investive vendore me norme 18%",
-    "Blerjet investive vendore me norme 8%"
-]
 
 # Calculate skewness
 skewness_values = csv_data[numerical_cols].apply(skew, nan_policy='omit')
