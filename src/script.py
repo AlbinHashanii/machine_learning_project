@@ -49,14 +49,16 @@ numerical_cols = [
 ]
 
 # Aggregate numerical data
+pd.set_option('display.max_columns', None)
 aggregated_data = csv_data[numerical_cols].agg(['mean', 'median', 'sum', 'std', 'count'])
 print("Aggregated Data:")
 print(aggregated_data)
+print()
 
 # Sample 10% of the dataset randomly
 csv_data_sampled = csv_data.sample(frac=0.1)
-
 print(f"Sampled Data Shape: {csv_data_sampled.shape}")
+print()
 
 # Check value counts
 categorical_columns = csv_data.select_dtypes(include=['object']).columns
@@ -106,7 +108,7 @@ outlier_indices = np.where(np.abs(z_scores) > threshold_z)[0]
 csv_data_no_outliers = csv_data.drop(outlier_indices)
 
 csv_data_no_outliers.to_csv("Investimet-2024-cleaned-no-outliers.csv", index=False)
-
+print()
 
 # Visualization without Outliers
 print("Visualizing distributions without outliers:")
@@ -123,7 +125,6 @@ for col in numerical_cols:
     plt.legend()
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
-
 print("Skewness of Numerical Columns without Outliers:")
 print(skewness_values_no_outliers)
 
