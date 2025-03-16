@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew, zscore
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
@@ -134,6 +135,18 @@ if target_column not in csv_data_no_outliers.columns:
 
 X = csv_data_no_outliers.drop(columns=[target_column])
 y = csv_data_no_outliers[target_column]
+
+# Before normalization
+print("Before Standardization:")
+print(X[numerical_cols].head())
+
+# Normalizaiton
+scaler = StandardScaler()
+X[numerical_cols] = scaler.fit_transform(X[numerical_cols])
+
+# After normalization
+print("\nAfter Standardization:")
+print(X[numerical_cols].head())
 
 # Training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
