@@ -129,6 +129,7 @@ for col in numerical_cols:
     plt.show()
 print("Skewness of Numerical Columns without Outliers:")
 print(skewness_values_no_outliers)
+print()
 
 target_column = 'Statusi'
 if target_column not in csv_data_no_outliers.columns:
@@ -174,6 +175,15 @@ lr_model = LinearRegression()
 lr_model.fit(X_train_res, y_train_res)
 y_pred_lr = lr_model.predict(X_test)
 
+# Evaluate the Linear Regression Model
+mae = mean_absolute_error(y_test, y_pred_lr)
+mse = mean_squared_error(y_test, y_pred_lr)
+r2 = r2_score(y_test, y_pred_lr)
+
+print("Linear Regression Model Evaluation:")
+print(f"Mean Absolute Error (MAE): {mae:.2f}")
+print(f"Mean Squared Error (MSE): {mse:.2f}")
+print(f"R-squared (R2): {r2:.2f}")
 
 # Visualize Actual vs Predicted values for Linear Regression
 plt.figure(figsize=(8, 6))
