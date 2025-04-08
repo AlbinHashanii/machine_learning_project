@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew, zscore
@@ -165,4 +167,20 @@ plt.ylabel("Count")
 plt.xticks(rotation=90)
 
 plt.tight_layout()
+plt.show()
+
+# Linear Regression Performance
+lr_model = LinearRegression()
+lr_model.fit(X_train_res, y_train_res)
+y_pred_lr = lr_model.predict(X_test)
+
+
+# Visualize Actual vs Predicted values for Linear Regression
+plt.figure(figsize=(8, 6))
+plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
+plt.scatter(range(len(y_test)), y_pred_lr, color='red', label='Predicted', alpha=0.7)
+plt.title("Linear Regression: Actual vs Predicted")
+plt.xlabel("Sample Index")
+plt.ylabel(target_column)
+plt.legend()
 plt.show()
