@@ -7,6 +7,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew, zscore
 import numpy as np
+from lightgbm import LGBMRegressor
+from xgboost import XGBRegressor
+from catboost import CatBoostRegressor
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
@@ -194,3 +197,43 @@ plt.xlabel("Sample Index")
 plt.ylabel(target_column)
 plt.legend()
 plt.show()
+
+# LGBMRegressor, XGBRegressor, and CatBoostRegressor
+lgbm = LGBMRegressor(random_state=42)
+xgb = XGBRegressor(random_state=42)
+catboost = CatBoostRegressor(random_state=42, verbose=0)
+
+lgbm.fit(X_train_res, y_train_res)
+xgb.fit(X_train_res, y_train_res)
+catboost.fit(X_train_res, y_train_res)
+
+predictions_lgbm = lgbm.predict(X_test)
+predictions_xgb = xgb.predict(X_test)
+predictions_catboost = catboost.predict(X_test)
+
+mae_lgbm = mean_absolute_error(y_test, predictions_lgbm)
+mse_lgbm = mean_squared_error(y_test, predictions_lgbm)
+r2_lgbm = r2_score(y_test, predictions_lgbm)
+
+mae_xgb = mean_absolute_error(y_test, predictions_xgb)
+mse_xgb = mean_squared_error(y_test, predictions_xgb)
+r2_xgb = r2_score(y_test, predictions_xgb)
+
+mae_catboost = mean_absolute_error(y_test, predictions_catboost)
+mse_catboost = mean_squared_error(y_test, predictions_catboost)
+r2_catboost = r2_score(y_test, predictions_catboost)
+
+print('LightGBM:')
+print(f'MAE: {mae_lgbm:.4f}')
+print(f'MSE: {mse_lgbm:.4f}')
+print(f'R-squared: {r2_lgbm:.4f}')
+print('------')
+print('XGBoost:')
+print(f'MAE: {mae_xgb:.4f}')
+print(f'MSE: {mse_xgb:.4f}')
+print(f'R-squared: {r2_xgb:.4f}')
+print('------')
+print('CatBoost:')
+print(f'MAE: {mae_catboost:.4f}')
+print(f'MSE: {mse_catboost:.4f}')
+print(f'R-squared: {r2_catboost:.4f}')
