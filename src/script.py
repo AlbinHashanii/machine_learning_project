@@ -237,3 +237,34 @@ print('CatBoost:')
 print(f'MAE: {mae_catboost:.4f}')
 print(f'MSE: {mse_catboost:.4f}')
 print(f'R-squared: {r2_catboost:.4f}')
+
+# Visualize Actual vs Predicted values for LightGBM
+plt.figure(figsize=(8, 6))
+plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
+plt.scatter(range(len(y_test)), predictions_lgbm, color='red', label='Predicted', alpha=0.7)
+plt.title("LightGBM: Actual vs Predicted")
+plt.xlabel("Sample Index")
+plt.ylabel(target_column)
+plt.legend()
+plt.show()
+
+# Visualize Actual vs Predicted values for XGBoost
+plt.figure(figsize=(8, 6))
+plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
+plt.scatter(range(len(y_test)), predictions_xgb, color='red', label='Predicted', alpha=0.7)
+plt.title("XGBoost: Actual vs Predicted")
+plt.xlabel("Sample Index")
+plt.ylabel(target_column)
+plt.legend()
+plt.show()
+
+# Visualize Actual vs Predicted values for CatBoost
+plt.figure(figsize=(8, 6))
+plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
+plt.scatter(range(len(y_test)), predictions_catboost, color='red', label='Predicted', alpha=0.7)
+plt.title("CatBoost: Actual vs Predicted")
+plt.xlabel("Sample Index")
+plt.ylabel(target_column)
+plt.legend()
+plt.show()
+
