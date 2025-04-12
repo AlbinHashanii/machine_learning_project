@@ -2,8 +2,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from imblearn.over_sampling import SMOTE
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score, accuracy_score, precision_score, \
+    recall_score, f1_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import LabelEncoder
 from scipy.stats import skew, zscore
 import numpy as np
@@ -173,6 +175,31 @@ plt.xticks(rotation=90)
 plt.tight_layout()
 plt.show()
 
+# Gaussian Naive Bayes classifier
+nb_classifier = GaussianNB()
+
+nb_classifier.fit(X_train_res, y_train_res)
+
+y_pred_nb = nb_classifier.predict(X_test)
+
+accuracy_nb = accuracy_score(y_test, y_pred_nb)
+precision_nb = precision_score(y_test, y_pred_nb, average='weighted')
+recall_nb = recall_score(y_test, y_pred_nb, average='weighted')
+f1_nb = f1_score(y_test, y_pred_nb, average='weighted')
+conf_matrix_nb = confusion_matrix(y_test, y_pred_nb)
+class_report_nb = classification_report(y_test, y_pred_nb)
+
+print("Naive Bayes Classifier Evaluation:")
+print(f"Accuracy: {accuracy_nb:.4f}")
+print("Confusion Matrix:")
+print(conf_matrix_nb)
+print("Classification Report:")
+print(class_report_nb)
+print(f"Precision: {precision_nb:.4f}")
+print(f"Recall: {recall_nb:.4f}")
+print(f"F1 Score: {f1_nb:.4f}")
+print()
+
 # Linear Regression Performance
 lr_model = LinearRegression()
 lr_model.fit(X_train_res, y_train_res)
@@ -187,6 +214,7 @@ print("Linear Regression Model Evaluation:")
 print(f"Mean Absolute Error (MAE): {mae:.2f}")
 print(f"Mean Squared Error (MSE): {mse:.2f}")
 print(f"R-squared (R2): {r2:.2f}")
+print()
 
 # Visualize Actual vs Predicted values for Linear Regression
 plt.figure(figsize=(8, 6))
@@ -228,15 +256,18 @@ print(f'MAE: {mae_lgbm:.4f}')
 print(f'MSE: {mse_lgbm:.4f}')
 print(f'R-squared: {r2_lgbm:.4f}')
 print('------')
+print()
 print('XGBoost:')
 print(f'MAE: {mae_xgb:.4f}')
 print(f'MSE: {mse_xgb:.4f}')
 print(f'R-squared: {r2_xgb:.4f}')
 print('------')
+print()
 print('CatBoost:')
 print(f'MAE: {mae_catboost:.4f}')
 print(f'MSE: {mse_catboost:.4f}')
 print(f'R-squared: {r2_catboost:.4f}')
+print()
 
 # Visualize Actual vs Predicted values for LightGBM
 plt.figure(figsize=(8, 6))
@@ -266,5 +297,19 @@ plt.title("CatBoost: Actual vs Predicted")
 plt.xlabel("Sample Index")
 plt.ylabel(target_column)
 plt.legend()
+plt.show()
+
+# Visualize the confusion matrix
+plt.figure(figsize=(12, 10))  # Increased figure size for better visibility
+plt.imshow(conf_matrix_nb, interpolation='nearest', cmap=plt.cm.Blues)
+plt.title("Naive Bayes Confusion Matrix", fontsize=14, pad=20)
+plt.colorbar()
+tick_marks = np.arange(len(target_encoder.classes_))
+class_names = target_encoder.inverse_transform(tick_marks)
+plt.xticks(tick_marks, class_names, rotation=90, fontsize=8)
+plt.yticks(tick_marks, class_names, fontsize=8)
+plt.xlabel("Predicted Label", fontsize=12, labelpad=10)
+plt.ylabel("True Label", fontsize=12, labelpad=10)
+plt.tight_layout()
 plt.show()
 
