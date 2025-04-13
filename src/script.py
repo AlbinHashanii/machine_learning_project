@@ -12,6 +12,7 @@ import numpy as np
 from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
+from sklearn.ensemble import RandomForestClassifier
 
 csv_data = pd.read_csv("atk-investimet-tvsh.csv", thousands=',')
 
@@ -313,3 +314,83 @@ plt.ylabel("True Label", fontsize=12, labelpad=10)
 plt.tight_layout()
 plt.show()
 
+# Random Forest
+if 'Statusi' not in csv_data_no_outliers.columns:
+    raise ValueError("Data must contain 'Statusi' column")
+
+X = csv_data_no_outliers.select_dtypes(include=['number']).drop(columns=['Statusi']).fillna(0)
+y = csv_data_no_outliers['Statusi']
+unique_classes = sorted(y.unique())
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = RandomForestClassifier(
+    n_estimators=100,
+    random_state=42,
+    class_weight='balanced'
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+plt.figure(figsize=(14, 7))
+
+
+class_acc = {cls: accuracy_score(y_test[y_test == cls], y_pred[y_test == cls]) 
+             for cls in unique_classes}
+bars = plt.bar([str(c) for c in class_acc.keys()], class_acc.values(), color='skyblue')
+
+
+for bar in bars:
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width()/2., height,
+             f'{height:.1%}', ha='center', va='bottom')
+
+overall_acc = accuracy_score(y_test, y_pred)
+plt.axhline(overall_acc, color='red', linestyle='--', 
+            label=f'Overall Accuracy ({overall_acc:.1%})')
+
+plt.title('Prediction Accuracy by Statusi Value - Random Forest', fontsize=16, pad=20)
+plt.xlabel('Statusi Value', fontsize=14)
+plt.ylabel('Accuracy', fontsize=14)
+plt.ylim(0, 1.1)
+plt.legend(fontsize=12)
+plt.grid(axis='y', alpha=0.2)
+plt.tight_layout()
+plt.show()
+
+# 7. Confusion Matrix
+plt.figure(figsize=(12, 10))
+cm = confusion_matrix(y_test, y_pred)
+plt.imshow(cm, cmap='Blues')
+plt.title('Confusion Matrix', fontsize=16, pad=20)
+plt.colorbar()
+
+for i in range(cm.shape[0]):
+    for j in range(cm.shape[1]):
+        if cm[i,j] > 0:
+            plt.text(j, i, str(cm[i,j]), 
+                    ha='center', va='center',
+                    color='white' if cm[i,j] > cm.max()/2 else 'black')
+
+plt.xticks(ticks=range(len(unique_classes)), labels=unique_classes)
+plt.yticks(ticks=range(len(unique_classes)), labels=unique_classes)
+plt.xlabel('Predicted Statusi', fontsize=14)
+plt.ylabel('Actual Statusi', fontsize=14)
+plt.tight_layout()
+plt.show()
+
+# 8. Print metrics
+print(f"\n=== Model Evaluation ===")
+print(f"Overall Accuracy: {overall_acc:.2f}")
+print("\nClassification Report:")
+print(classification_report(y_test, y_pred, zero_division=0))
+
+# 9. Feature Importance
+importances = pd.DataFrame({
+    'Feature': X.columns,
+    'Importance': model.feature_importances_
+}).sort_values('Importance', ascending=False)
+
+print("\nTop 10 Most Important Features:")
+print(importances.head(10).to_string(index=False))
