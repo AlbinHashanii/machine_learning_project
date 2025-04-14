@@ -301,7 +301,7 @@ plt.legend()
 plt.show()
 
 # Visualize the confusion matrix
-plt.figure(figsize=(12, 10))  # Increased figure size for better visibility
+plt.figure(figsize=(12, 10))
 plt.imshow(conf_matrix_nb, interpolation='nearest', cmap=plt.cm.Blues)
 plt.title("Naive Bayes Confusion Matrix", fontsize=14, pad=20)
 plt.colorbar()
@@ -385,6 +385,14 @@ print(f"\n=== Model Evaluation ===")
 print(f"Overall Accuracy: {overall_acc:.2f}")
 print("\nClassification Report:")
 print(classification_report(y_test, y_pred, zero_division=0))
+precision_rf = precision_score(y_test, y_pred, average='weighted', zero_division=0)
+recall_rf = recall_score(y_test, y_pred, average='weighted', zero_division=0)
+f1_rf = f1_score(y_test, y_pred, average='weighted', zero_division=0)
+
+print("\nRandom Forest Additional Metrics:")
+print(f"Precision: {precision_rf:.4f}")
+print(f"Recall: {recall_rf:.4f}")
+print(f"F1 Score: {f1_rf:.4f}")
 
 # 9. Feature Importance
 importances = pd.DataFrame({
