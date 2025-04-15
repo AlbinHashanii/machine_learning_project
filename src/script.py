@@ -256,21 +256,59 @@ print('LightGBM:')
 print(f'MAE: {mae_lgbm:.4f}')
 print(f'MSE: {mse_lgbm:.4f}')
 print(f'R-squared: {r2_lgbm:.4f}')
-print('------')
-print()
+print('------\n')
+
 print('XGBoost:')
 print(f'MAE: {mae_xgb:.4f}')
 print(f'MSE: {mse_xgb:.4f}')
 print(f'R-squared: {r2_xgb:.4f}')
-print('------')
-print()
+print('------\n')
+
 print('CatBoost:')
 print(f'MAE: {mae_catboost:.4f}')
 print(f'MSE: {mse_catboost:.4f}')
 print(f'R-squared: {r2_catboost:.4f}')
-print()
+print('------\n')
 
-# Visualize Actual vs Predicted values for LightGBM
+predictions_lgbm_class = np.round(predictions_lgbm).astype(int)
+predictions_xgb_class = np.round(predictions_xgb).astype(int)
+predictions_catboost_class = np.round(predictions_catboost).astype(int)
+
+predictions_lgbm_class = np.clip(predictions_lgbm_class, y_train_res.min(), y_train_res.max())
+predictions_xgb_class = np.clip(predictions_xgb_class, y_train_res.min(), y_train_res.max())
+predictions_catboost_class = np.clip(predictions_catboost_class, y_train_res.min(), y_train_res.max())
+
+precision_lgbm = precision_score(y_test, predictions_lgbm_class, average='weighted', zero_division=0)
+recall_lgbm = recall_score(y_test, predictions_lgbm_class, average='weighted', zero_division=0)
+f1_lgbm = f1_score(y_test, predictions_lgbm_class, average='weighted', zero_division=0)
+
+print('LightGBM Classification Metrics:')
+print(f'Precision: {precision_lgbm:.4f}')
+print(f'Recall: {recall_lgbm:.4f}')
+print(f'F1 Score: {f1_lgbm:.4f}')
+print('------\n')
+
+precision_xgb = precision_score(y_test, predictions_xgb_class, average='weighted', zero_division=0)
+recall_xgb = recall_score(y_test, predictions_xgb_class, average='weighted', zero_division=0)
+f1_xgb = f1_score(y_test, predictions_xgb_class, average='weighted', zero_division=0)
+
+print('XGBoost Classification Metrics:')
+print(f'Precision: {precision_xgb:.4f}')
+print(f'Recall: {recall_xgb:.4f}')
+print(f'F1 Score: {f1_xgb:.4f}')
+print('------\n')
+
+precision_catboost = precision_score(y_test, predictions_catboost_class, average='weighted', zero_division=0)
+recall_catboost = recall_score(y_test, predictions_catboost_class, average='weighted', zero_division=0)
+f1_catboost = f1_score(y_test, predictions_catboost_class, average='weighted', zero_division=0)
+
+print('CatBoost Classification Metrics:')
+print(f'Precision: {precision_catboost:.4f}')
+print(f'Recall: {recall_catboost:.4f}')
+print(f'F1 Score: {f1_catboost:.4f}')
+print('------\n')
+
+# Visualization: Actual vs Predicted values for LightGBM
 plt.figure(figsize=(8, 6))
 plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
 plt.scatter(range(len(y_test)), predictions_lgbm, color='red', label='Predicted', alpha=0.7)
@@ -280,7 +318,7 @@ plt.ylabel(target_column)
 plt.legend()
 plt.show()
 
-# Visualize Actual vs Predicted values for XGBoost
+# Visualization: Actual vs Predicted values for XGBoost
 plt.figure(figsize=(8, 6))
 plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
 plt.scatter(range(len(y_test)), predictions_xgb, color='red', label='Predicted', alpha=0.7)
@@ -290,7 +328,7 @@ plt.ylabel(target_column)
 plt.legend()
 plt.show()
 
-# Visualize Actual vs Predicted values for CatBoost
+# Visualization: Actual vs Predicted values for CatBoost
 plt.figure(figsize=(8, 6))
 plt.scatter(range(len(y_test)), y_test, color='blue', label='Actual')
 plt.scatter(range(len(y_test)), predictions_catboost, color='red', label='Predicted', alpha=0.7)
@@ -299,6 +337,7 @@ plt.xlabel("Sample Index")
 plt.ylabel(target_column)
 plt.legend()
 plt.show()
+
 
 # Visualize the confusion matrix
 plt.figure(figsize=(12, 10))
