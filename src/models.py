@@ -1,3 +1,4 @@
+from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier
@@ -27,4 +28,9 @@ def train_catboost(X, y):
 
 def train_random_forest(X, y):
     model = RandomForestClassifier(random_state=42, class_weight='balanced', n_estimators=100).fit(X, y)
+    return model
+
+def train_kmeans(X, n_clusters):
+    model = KMeans(n_clusters=n_clusters, random_state=42)
+    model.fit(X)
     return model

@@ -1,7 +1,7 @@
 from data_loader import load_data
 from preprocessing import encode_categorical, remove_outliers, apply_smote
 from visualization import plot_distributions, plot_confusion_matrix_percent, \
-    plot_per_class_accuracy
+    plot_per_class_accuracy, plot_db_index
 from models import *
 from evaluation import *
 from sklearn.model_selection import train_test_split
@@ -42,11 +42,18 @@ models_dict = {
     "LightGBM": train_lgbm(X_train_res, y_train_res),
     "XGBoost": train_xgboost(X_train_res, y_train_res),
     "CatBoost": train_catboost(X_train_res, y_train_res),
-    "Random Forest": train_random_forest(X_train_res, y_train_res)
+    "Random Forest": train_random_forest(X_train_res, y_train_res),
+"K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_))
 }
 
 for name, model in models_dict.items():
     print(f"\n {name} Evaluation")
+
+    if name == "K‑Means":
+        cluster_labels = model.predict(X_test)
+        evaluate_clustering(X_test, cluster_labels, y_true=y_test)
+        plot_db_index(X_test, k_min=2, k_max=10)
+        continue
 
     if name == "Linear Regression":
         preds = model.predict(X_test)
@@ -72,3 +79,5 @@ for name, model in models_dict.items():
             plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, name)
             plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_,
                                           "Random Forest Confusion Matrix")
+
+
