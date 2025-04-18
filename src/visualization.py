@@ -2,7 +2,10 @@ import matplotlib.pyplot as plt
 from scipy.stats import skew
 import pandas as pd
 import numpy as np
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from sklearn.metrics import accuracy_score, confusion_matrix, silhouette_score, silhouette_samples, davies_bouldin_score
+
 
 def plot_distributions(df: pd.DataFrame, cols: list, title_suffix: str = "", show_plot: bool = True):
     for col in cols:
@@ -17,6 +20,7 @@ def plot_distributions(df: pd.DataFrame, cols: list, title_suffix: str = "", sho
         plt.ylabel("Frequency")
         plt.legend()
         plt.grid(axis='y', alpha=0.7)
+        plt.tight_layout()
         plt.show()
 
 
@@ -39,17 +43,19 @@ def plot_per_class_accuracy(y_true, y_pred, class_labels, title="Prediction Accu
                  f'{height:.1%}', ha='center', va='bottom', fontsize=8)
 
     overall_acc = accuracy_score(y_true, y_pred)
-    plt.axhline(overall_acc, color='red', linestyle='--',
-                label=f'Overall Accuracy ({overall_acc:.1%})')
+    plt.axhline(overall_acc, color='red', linestyle='--', label=f'Overall Accuracy ({overall_acc:.1%})')
 
     plt.title(title, fontsize=16, pad=20)
     plt.xlabel("Statusi Value", fontsize=14)
     plt.ylabel("Accuracy", fontsize=14)
+    plt.xticks(rotation=45, ha='right', fontsize=10)
     plt.ylim(0, 1.1)
     plt.legend(fontsize=12)
     plt.grid(axis='y', alpha=0.2)
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.25)
     plt.show()
+
 
 def plot_confusion_matrix_percent(y_true, y_pred, class_names, title="Confusion Matrix with Percentages"):
     cm = confusion_matrix(y_true, y_pred, labels=range(len(class_names)))
@@ -60,7 +66,7 @@ def plot_confusion_matrix_percent(y_true, y_pred, class_names, title="Confusion 
     plt.colorbar()
 
     tick_marks = np.arange(len(class_names))
-    plt.xticks(tick_marks, class_names, rotation=90, fontsize=8)
+    plt.xticks(tick_marks, class_names, rotation=45, ha='right', fontsize=8)
     plt.yticks(tick_marks, class_names, fontsize=8)
 
     for i in range(cm.shape[0]):
@@ -68,10 +74,25 @@ def plot_confusion_matrix_percent(y_true, y_pred, class_names, title="Confusion 
             value = cm[i, j]
             if value > 0:
                 plt.text(j, i, f'{value}', ha='center', va='center',
-                         color='white' if value > cm.max() * 0.5 else 'black',
-                         fontsize=7)
+                         color='white' if value > cm.max() * 0.5 else 'black', fontsize=7)
 
     plt.xlabel("Predicted Statusi", fontsize=14)
     plt.ylabel("Actual Statusi", fontsize=14)
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.25)
+    plt.show()
+
+def plot_db_index(X, k_min=2, k_max=10):
+    ks = list(range(k_min, k_max+1))
+    db_scores = []
+    for k in ks:
+        km = KMeans(n_clusters=k, random_state=42, n_init=10).fit(X)
+        db_scores.append(davies_bouldin_score(X, km.labels_))
+    plt.figure(figsize=(8, 4))
+    plt.plot(ks, db_scores, marker='o')
+    plt.title("Davies‑Bouldin Index vs. Number of Clusters")
+    plt.xlabel("Number of clusters (k)")
+    plt.ylabel("Davies‑Bouldin Index") # lower is better
+    plt.xticks(ks)
     plt.tight_layout()
     plt.show()
