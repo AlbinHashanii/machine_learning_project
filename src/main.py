@@ -1,7 +1,7 @@
 from data_loader import load_data
 from preprocessing import encode_categorical, remove_outliers, apply_smote
 from visualization import plot_distributions, plot_confusion_matrix_percent, \
-    plot_per_class_accuracy, plot_db_index
+    plot_per_class_accuracy, plot_db_index, plot_regression_scatter
 from models import *
 from evaluation import *
 from sklearn.model_selection import train_test_split
@@ -58,6 +58,9 @@ for name, model in models_dict.items():
     if name == "Linear Regression":
         preds = model.predict(X_test)
         evaluate_regression(y_test, preds)
+        plot_regression_scatter(y_test, preds)
+
+
     elif name in ["LightGBM", "XGBoost", "CatBoost"]:
         preds = model.predict(X_test)
         preds_class = np.clip(np.round(preds).astype(int), y_train_res.min(), y_train_res.max())

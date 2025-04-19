@@ -3,7 +3,6 @@ from scipy.stats import skew
 import pandas as pd
 import numpy as np
 from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
 from sklearn.metrics import accuracy_score, confusion_matrix, silhouette_score, silhouette_samples, davies_bouldin_score
 
 
@@ -94,5 +93,17 @@ def plot_db_index(X, k_min=2, k_max=10):
     plt.xlabel("Number of clusters (k)")
     plt.ylabel("Davies‑Bouldin Index") # lower is better
     plt.xticks(ks)
+    plt.tight_layout()
+    plt.show()
+
+def plot_regression_scatter(y_true, y_pred, title="Regression: Actual vs Predicted"):
+    plt.figure(figsize=(8, 8))
+    plt.scatter(y_true, y_pred, alpha=0.5)
+    min_val = min(min(y_true), min(y_pred))
+    max_val = max(max(y_true), max(y_pred))
+    plt.plot([min_val, max_val], [min_val, max_val], linestyle='--')
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.title(title)
     plt.tight_layout()
     plt.show()
