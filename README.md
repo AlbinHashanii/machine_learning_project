@@ -1,5 +1,5 @@
 
-# Machine Learning: ATK Investments Dataset
+# Machine Learning: Administrative data of the Kosovo Tax Administration - ATK
 
 ## Project Information
 - Institution: University of Pristina "Hasan Prishtina"
@@ -81,7 +81,7 @@ This dataset sourced from [ATK](https://www.atk-ks.org/open-data/) contains a to
 
     - Sampling - Randomly samples 10% of the dataset to inspect a smaller subset for analysis.
       
-      ![Project Logo](images-readme/sampled_data.png) 
+      ![Project Logo](images/sampled_data.png) 
 
     - Exploratory Data Analysis (EDA) on Numerical Features - Skewness: The code computes skewness to assess the asymmetry of numerical distributions, using histograms with mean and median markers to visually highlight any skew.
       
