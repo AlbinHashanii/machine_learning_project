@@ -107,29 +107,3 @@ def plot_regression_scatter(y_true, y_pred, title="Regression: Actual vs Predict
     plt.title(title)
     plt.tight_layout()
     plt.show()
-
-def plot_training_history(history):
-    """
-    history: the History object returned by model.fit(...)
-    """
-    # Loss
-    plt.figure(figsize=(8, 4))
-    plt.plot(history.history['loss'], label='Train Loss')
-    plt.plot(history.history['val_loss'], label='Val Loss')
-    plt.title("Training and Validation Loss")
-    plt.xlabel("Epoch")
-    plt.ylabel("Loss")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
-
-    # Accuracy
-    plt.figure(figsize=(8, 4))
-    plt.plot(history.history['accuracy'], label='Train Acc')
-    plt.plot(history.history['val_accuracy'], label='Val Acc')
-    plt.title("Training and Validation Accuracy")
-    plt.xlabel("Epoch")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.tight_layout()
-    plt.show()

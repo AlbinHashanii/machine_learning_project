@@ -1,7 +1,7 @@
 from data_loader import load_data
 from preprocessing import encode_categorical, remove_outliers, apply_smote
 from visualization import plot_distributions, plot_confusion_matrix_percent, \
-    plot_per_class_accuracy, plot_db_index, plot_regression_scatter, plot_training_history
+    plot_per_class_accuracy, plot_db_index, plot_regression_scatter
 from models import *
 from evaluation import *
 from sklearn.model_selection import train_test_split
@@ -43,7 +43,6 @@ models_dict = {
     "XGBoost": train_xgboost(X_train_res, y_train_res),
     "CatBoost": train_catboost(X_train_res, y_train_res),
     "Random Forest": train_random_forest(X_train_res, y_train_res),
-    "Neural Network": train_mlp(X_train_res, y_train_res),
     "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_))
 }
 
@@ -69,43 +68,6 @@ for name, model in models_dict.items():
         evaluate_classification(y_test, preds_class)
         plot_per_class_accuracy(y_test, preds_class, encoders[target_column].classes_, name)
         plot_confusion_matrix_percent(y_test, preds_class, encoders[target_column].classes_, name + " Confusion Matrix")
-
-        # Neural Network
-    if name == "Neural Network":
-            # predict probabilities → class indices
-        probs = model.predict(X_test)
-        preds = np.argmax(probs, axis=1)
-
-            # detailed report
-        print(classification_report(
-            y_test,
-            preds,
-            target_names=encoders[target_column].classes_
-            ))
-
-            # summary metrics
-        acc = accuracy_score(y_test, preds)
-        prec = precision_score(y_test, preds, average='weighted', zero_division=0)
-        rec = recall_score(y_test, preds, average='weighted', zero_division=0)
-        f1 = f1_score(y_test, preds, average='weighted', zero_division=0)
-        print(f"Accuracy:  {acc:.4f}")
-        print(f"Precision: {prec:.4f}")
-        print(f"Recall:    {rec:.4f}")
-        print(f"F1-score:  {f1:.4f}")
-
-            # and your usual plots
-        plot_per_class_accuracy(
-            y_test, preds,
-            encoders[target_column].classes_,
-            title="MLP Accuracy by Class"
-            )
-        plot_confusion_matrix_percent(
-            y_test, preds,
-            encoders[target_column].classes_,
-            title="MLP Confusion Matrix"
-            )
-        plot_training_history("Neural Network")
-        continue
 
     else:
         preds = model.predict(X_test)
