@@ -62,8 +62,7 @@ for name, model in models_dict.items():
 
 
     elif name in ["LightGBM", "XGBoost", "CatBoost"]:
-        preds = model.predict(X_test)
-        preds_class = np.clip(np.round(preds).astype(int), y_train_res.min(), y_train_res.max())
+        preds_class = model.predict(X_test)
 
         evaluate_classification(y_test, preds_class)
         plot_per_class_accuracy(y_test, preds_class, encoders[target_column].classes_, name)
