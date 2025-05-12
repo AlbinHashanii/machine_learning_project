@@ -1,3 +1,4 @@
+from turtle import pd
 from data_loader import load_data
 from preprocessing import encode_categorical, remove_outliers, apply_smote
 from visualization import plot_distributions, plot_confusion_matrix_percent, \
@@ -43,7 +44,8 @@ models_dict = {
     "XGBoost": train_xgboost(X_train_res, y_train_res),
     "CatBoost": train_catboost(X_train_res, y_train_res),
     "Random Forest": train_random_forest(X_train_res, y_train_res),
-    "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_))
+    "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_)),
+    "Autoencoders": build_autoencoder(X_train)
 }
 
 for name, model in models_dict.items():
@@ -60,6 +62,12 @@ for name, model in models_dict.items():
         evaluate_regression(y_test, preds)
         plot_regression_scatter(y_test, preds)
 
+    if name == "Autoencoder":
+        autoencoder, encoder = model[0], model[1]
+        autoencoder.fit(X_train, X_train, epochs=50, batch_size=256, shuffle=True, validation_split=0.2, verbose=1)
+        encoded_features_test = encoder.predict(X_test)
+        reconstructed = autoencoder.predict(X_test)
+        plot_distributions(pd.DataFrame(encoded_features_test), cols=[0, 1], title_suffix="Encoded Features")
 
     elif name in ["LightGBM", "XGBoost", "CatBoost"]:
         preds_class = model.predict(X_test)
