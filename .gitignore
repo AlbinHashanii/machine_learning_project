@@ -170,3 +170,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 /src/catboost_info/
+/src/lightning_logs
+/src/saved_models
