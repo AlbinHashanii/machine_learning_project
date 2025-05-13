@@ -7,6 +7,7 @@ from models import *
 from evaluation import *
 from sklearn.model_selection import train_test_split
 import numpy as np
+import matplotlib.pyplot as plt
 
 numerical_cols = [
     "Viti", "Muaji", "Tatimpaguesit",
@@ -45,7 +46,7 @@ models_dict = {
     "CatBoost": train_catboost(X_train_res, y_train_res),
     "Random Forest": train_random_forest(X_train_res, y_train_res),
     "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_)),
-    "Autoencoders": build_autoencoder(X_train)
+     "RNN": train_rnn(X_train_res, y_train_res),
 }
 
 for name, model in models_dict.items():
@@ -62,12 +63,28 @@ for name, model in models_dict.items():
         evaluate_regression(y_test, preds)
         plot_regression_scatter(y_test, preds)
 
-    if name == "Autoencoder":
-        autoencoder, encoder = model[0], model[1]
-        autoencoder.fit(X_train, X_train, epochs=50, batch_size=256, shuffle=True, validation_split=0.2, verbose=1)
-        encoded_features_test = encoder.predict(X_test)
-        reconstructed = autoencoder.predict(X_test)
-        plot_distributions(pd.DataFrame(encoded_features_test), cols=[0, 1], title_suffix="Encoded Features")
+    elif name == "RNN":
+        # prepare test set the same way
+        X_test_arr = X_test.values
+        X_test_seq = X_test_arr.reshape((X_test_arr.shape[0], X_test_arr.shape[1], 1))
+        # predict probabilities, then class
+        probs = model.predict(X_test_seq)
+        preds = np.argmax(probs, axis=1)
+
+        # prints precision, recall, f1, accuracy
+        evaluate_classification(y_test, preds)
+
+        # visualize per-class accuracy and confusion
+        plot_per_class_accuracy(
+            y_test, preds,
+            encoders[target_column].classes_,
+            title="RNN Accuracy by Class"
+        )
+        plot_confusion_matrix_percent(
+            y_test, preds,
+            encoders[target_column].classes_,
+            title="RNN Confusion Matrix"
+        )
 
     elif name in ["LightGBM", "XGBoost", "CatBoost"]:
         preds_class = model.predict(X_test)

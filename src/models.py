@@ -1,3 +1,5 @@
+import numpy as np
+import pandas as pd
 from sklearn.cluster import KMeans
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import GaussianNB
@@ -5,24 +7,7 @@ from sklearn.ensemble import RandomForestClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
-from tensorflow.keras import layers, models
-
-def build_autoencoder(X_train):
-    input_dim = X_train.shape[1]
-    
-    # Define Autoencoder architecture
-    input_layer = layers.Input(shape=(input_dim,))
-    encoded = layers.Dense(64, activation='relu')(input_layer)
-    encoded = layers.Dense(32, activation='relu')(encoded)  # Bottleneck layer
-    
-    decoded = layers.Dense(64, activation='relu')(encoded)
-    decoded = layers.Dense(input_dim, activation='sigmoid')(decoded)  # Reconstructed output
-    
-    autoencoder = models.Model(input_layer, decoded)
-    encoder = models.Model(input_layer, encoded)  # Encoder model
-    
-    autoencoder.compile(optimizer='adam', loss='mean_squared_error')
-    return autoencoder, encoder
+from tensorflow.keras import Sequential, Input, layers, models
 
 def train_naive_bayes(X, y):
     model = GaussianNB().fit(X, y)
@@ -50,4 +35,32 @@ def train_kmeans(X, n_clusters):
     model.fit(X)
     return model
 
-#trigger commit
+def train_rnn(X, y, epochs=40, batch_size=32):
+    # ensure numpy arrays
+    X_arr = X.values if isinstance(X, (pd.DataFrame, pd.Series)) else X
+    y_arr = y.values if isinstance(y, (pd.DataFrame, pd.Series)) else y
+
+    n_samples, n_features = X_arr.shape
+    # reshape to (samples, timesteps, features_per_step=1)
+    X_seq = X_arr.reshape((n_samples, n_features, 1))
+
+    num_classes = len(np.unique(y_arr))
+
+    model = Sequential([
+        Input(shape=(n_features, 1)),
+        layers.LSTM(64, activation='tanh'),
+        layers.Dense(num_classes, activation='softmax')
+    ])
+    model.compile(
+        optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+    model.fit(
+        X_seq, y_arr,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_split=0.1,
+        verbose=1
+    )
+    return model
