@@ -47,6 +47,7 @@ models_dict = {
     "Random Forest": train_random_forest(X_train_res, y_train_res),
     "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_)),
      "RNN": train_rnn(X_train_res, y_train_res),
+     "DBN": train_dbn(X_train_res, y_train_res),
 }
 
 for name, model in models_dict.items():
@@ -62,6 +63,14 @@ for name, model in models_dict.items():
         preds = model.predict(X_test)
         evaluate_regression(y_test, preds)
         plot_regression_scatter(y_test, preds)
+
+    if name == "DBN":
+        X_test_arr = X_test.values
+        probs = model.predict(X_test_arr)
+        preds = np.argmax(probs, axis=1)
+        evaluate_classification(y_test, preds)
+        plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, title="DBN Accuracy by Class")
+        plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, title="DBN Confusion Matrix")
 
     elif name == "RNN":
         # prepare test set the same way
