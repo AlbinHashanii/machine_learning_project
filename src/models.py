@@ -8,6 +8,11 @@ from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 from tensorflow.keras import Sequential, Input, layers, models
+from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
+from sklearn.utils import compute_class_weight
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.layers import Dense, Input, BatchNormalization
+
 
 def train_naive_bayes(X, y):
     model = GaussianNB().fit(X, y)
@@ -63,4 +68,46 @@ def train_rnn(X, y, epochs=40, batch_size=32):
         validation_split=0.1,
         verbose=1
     )
+    return model
+
+def train_dbn(X, y, epochs=20, batch_size=128):
+    X_arr = X.values if hasattr(X, "values") else X
+    y_arr = y.values if hasattr(y, "values") else y
+
+    unique_classes = np.unique(y_arr)
+    class_map = {label: idx for idx, label in enumerate(unique_classes)}
+    y_arr = np.array([class_map[label] for label in y_arr])
+    num_classes = len(unique_classes)
+
+    model = Sequential([
+        Input(shape=(X_arr.shape[1],)),
+        Dense(128, activation='relu'),
+        BatchNormalization(),
+        Dense(64, activation='relu'),
+        BatchNormalization(),
+        Dense(num_classes, activation='softmax')
+    ])
+
+    model.compile(
+        optimizer=Adam(learning_rate=0.001),
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+    lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=1e-5)
+
+    class_weights = compute_class_weight('balanced', classes=np.unique(y_arr), y=y_arr)
+    class_weight_dict = dict(enumerate(class_weights))
+
+    model.fit(
+        X_arr, y_arr,
+        epochs=epochs,
+        batch_size=batch_size,
+        validation_split=0.1,
+        callbacks=[early_stopping, lr_scheduler],
+        class_weight=class_weight_dict,
+        verbose=1
+    )
+
     return model
