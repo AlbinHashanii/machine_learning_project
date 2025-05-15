@@ -107,7 +107,7 @@ def train_dbn(X, y, epochs=40, batch_size=128, verbose=1):
         epochs=epochs,
         batch_size=batch_size,
         validation_split=0.2,
-        callbacks=[lr_scheduler],  # <-- No EarlyStopping here
+        callbacks=[lr_scheduler],
         class_weight=class_weight_dict,
         verbose=verbose
     )
