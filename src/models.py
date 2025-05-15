@@ -12,7 +12,8 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
 from sklearn.utils import compute_class_weight
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Dense, Input, BatchNormalization
-
+from pytorch_tabnet.tab_model import TabNetClassifier
+import torch
 
 def train_naive_bayes(X, y):
     model = GaussianNB().fit(X, y)
@@ -108,6 +109,33 @@ def train_dbn(X, y, epochs=20, batch_size=128):
         callbacks=[early_stopping, lr_scheduler],
         class_weight=class_weight_dict,
         verbose=1
+    )
+
+    return model
+
+
+def train_tabnet(X, y, max_epochs=50):
+    X_arr = X.values.astype("float32") if hasattr(X, "values") else X.astype("float32")
+    y_arr = y.values.astype("int64") if hasattr(y, "values") else y.astype("int64")
+
+    model = TabNetClassifier(
+        optimizer_fn=torch.optim.Adam,
+        optimizer_params=dict(lr=2e-2),
+        scheduler_params={"step_size": 10, "gamma": 0.9},
+        scheduler_fn=torch.optim.lr_scheduler.StepLR,
+        mask_type="entmax",  # sparse attention
+        verbose=1,
+    )
+
+    model.fit(
+        X_train=X_arr,
+        y_train=y_arr,
+        max_epochs=max_epochs,
+        patience=10,
+        batch_size=1024,
+        virtual_batch_size=128,
+        num_workers=0,
+        drop_last=False
     )
 
     return model
