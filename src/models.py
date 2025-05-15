@@ -71,13 +71,13 @@ def train_rnn(X, y, epochs=40, batch_size=32):
     )
     return model
 
-def train_dbn(X, y, epochs=20, batch_size=128):
-    X_arr = X.values if hasattr(X, "values") else X
-    y_arr = y.values if hasattr(y, "values") else y
+def train_dbn(X, y, epochs=40, batch_size=128, verbose=1):
+    X_arr = X.values if hasattr(X, "values") else np.array(X)
+    y_arr = y.values if hasattr(y, "values") else np.array(y)
 
     unique_classes = np.unique(y_arr)
     class_map = {label: idx for idx, label in enumerate(unique_classes)}
-    y_arr = np.array([class_map[label] for label in y_arr])
+    y_encoded = np.array([class_map[label] for label in y_arr])
     num_classes = len(unique_classes)
 
     model = Sequential([
@@ -95,20 +95,21 @@ def train_dbn(X, y, epochs=20, batch_size=128):
         metrics=['accuracy']
     )
 
-    early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
-    lr_scheduler = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=2, min_lr=1e-5)
+    lr_scheduler = ReduceLROnPlateau(
+        monitor='val_loss', factor=0.5, patience=2, min_lr=1e-5, verbose=verbose
+    )
 
-    class_weights = compute_class_weight('balanced', classes=np.unique(y_arr), y=y_arr)
+    class_weights = compute_class_weight('balanced', classes=np.unique(y_encoded), y=y_encoded)
     class_weight_dict = dict(enumerate(class_weights))
 
     model.fit(
-        X_arr, y_arr,
+        X_arr, y_encoded,
         epochs=epochs,
         batch_size=batch_size,
-        validation_split=0.1,
-        callbacks=[early_stopping, lr_scheduler],
+        validation_split=0.2,
+        callbacks=[lr_scheduler],  # <-- No EarlyStopping here
         class_weight=class_weight_dict,
-        verbose=1
+        verbose=verbose
     )
 
     return model
