@@ -39,6 +39,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 X_train_res, y_train_res = apply_smote(X_train, y_train)
 
 models_dict = {
+    "TabNet": train_tabnet(X_train_res, y_train_res),
     "Naive Bayes": train_naive_bayes(X_train_res, y_train_res),
     "Linear Regression": train_linear_regression(X_train_res, y_train_res),
     "LightGBM": train_lgbm(X_train_res, y_train_res),
@@ -101,7 +102,14 @@ for name, model in models_dict.items():
         evaluate_classification(y_test, preds_class)
         plot_per_class_accuracy(y_test, preds_class, encoders[target_column].classes_, name)
         plot_confusion_matrix_percent(y_test, preds_class, encoders[target_column].classes_, name + " Confusion Matrix")
+    elif name == "TabNet":
+        X_test_np = X_test.values.astype("float32")
+        preds_class = model.predict(X_test_np)
+        preds = preds_class.reshape(-1)
 
+        evaluate_classification(y_test, preds)
+        plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, name)
+        plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, name + " Confusion Matrix")
     else:
         preds = model.predict(X_test)
         evaluate_classification(y_test, preds)
