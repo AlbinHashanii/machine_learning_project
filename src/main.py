@@ -49,6 +49,7 @@ models_dict = {
     "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_)),
      "RNN": train_rnn(X_train_res, y_train_res),
      "DBN": train_dbn(X_train_res, y_train_res),
+    "ExtraTrees": train_extra_trees(X_train_res, y_train_res)
 }
 
 for name, model in models_dict.items():
@@ -72,6 +73,13 @@ for name, model in models_dict.items():
         evaluate_classification(y_test, preds)
         plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, title="DBN Accuracy by Class")
         plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, title="DBN Confusion Matrix")
+
+    elif name == "ExtraTrees":
+        preds = model.predict(X_test)
+
+        evaluate_classification(y_test, preds)
+        plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, name)
+        plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, name + " Confusion Matrix")
 
     elif name == "RNN":
         # prepare test set the same way
