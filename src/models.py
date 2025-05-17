@@ -14,6 +14,19 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Dense, Input, BatchNormalization
 from pytorch_tabnet.tab_model import TabNetClassifier
 import torch
+from sklearn.ensemble import ExtraTreesClassifier
+
+def train_extra_trees(X, y):
+    model = ExtraTreesClassifier(
+        n_estimators=500,
+        max_depth=20,
+        class_weight='balanced',
+        random_state=42,
+        n_jobs=-1
+    )
+    model.fit(X, y)
+    return model
+
 
 def train_naive_bayes(X, y):
     model = GaussianNB().fit(X, y)
