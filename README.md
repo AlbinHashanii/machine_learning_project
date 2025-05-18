@@ -363,7 +363,7 @@ The real trouble spots remain the rare or highly similar corporate forms: “Kon
 The ExtraTrees confusion matrix makes it clear that the model virtually masters the high-volume, distinctive classes:
 - “Individual” (5152 correct), “SH.P.K.” (5418), “Ortakëria e përgjithshme” (977) and “Shoqëri akcionare” (803) all sit strongly on the diagonal with minimal spillover. In contrast, the low-support corporate types like “Konsorcium,” “Degë e Shoqërisë së Huaj,” and “Shoqëri Komandite” are scattered across neighbouring labels, often falling into SH.P.K. or Individual.
 
-![Project Logo](images/extratrees-cm.png)
+![Project Logo](images/extratress-cm.png)
 
 ## CatBoost
 CatBoost settles at a 74.0 % overall accuracy, striking a similar balance of rock-solid winners and weaker fringe categories. It achieves 100 % on the most distinctive labels. 
@@ -382,7 +382,7 @@ The CatBoost confusion matrix tells much the same story as the other tree-based 
 The RNN’s 44.9 % overall accuracy tells the story of a model that’s still under-trained after just two epochs. 
 - On the bright side, it “locks in” a handful of highly distinctive labels—“Bashkësi Fetare,” “Komp.pub e kufizuar,” “Kompani e huaj,” “Ortakëria e kufizuar,” and “Tjetër” all hit 100 %, and “Ortakeri e kufizuar” even reaches 97.4 %—but most classes languish well below the mean.
 
-![Project Logo](images/rnn-2.png)
+![Project Logo](images/rnn-2-fixed.png)
 
 After extending training, the RNN’s overall accuracy jumps to 69.0 %, and it now “locks in” many of the previously elusive classes. 
  - Highly distinctive labels like "Bashkësi Fetare", "Agjension i huaj qeveritar", "Komp.pub e kufizuar", "Kompani sigurimi", "Organizata Buxhetore", "Ortakëria e kufizuar", "Tjetër".
@@ -406,11 +406,11 @@ After 100 epochs the DNN settles at just 48.5 % overall accuracy, showing that i
 After pushing the DNN further, it edges up to 50.4 % overall accuracy—still modest, but with clearer strengths and weaknesses.
 - Again from the picture, we can clearly see that DNN decreased the 100% in some columns that were predicted 100% by the DNN with 100 epochs, but increased the ones with lower percentage. 
 
-![Project Logo](images/dnn-200-epoka.png)
+![Project Logo](images/dnn-200.png)
 
 After training to convergence, the DNN edges up to 57.5 % overall accuracy, but the pattern remains the same: it perfectly “memorizes” the most distinctive labels while still under-performing on mid- and low-frequency classes.
 
-![Project Logo](images/dnn-300-epoka.png)
+![Project Logo](images/dnn-300.png)
 
 The DNN’s confusion matrix makes it clear that it perfectly “memorizes” the high-volume classes: 3947 out of 4712 true "Individuals" and 2857 SH.P.K. entries sit neatly on the diagonal. 
 -  In short, the network excels on the most distinctive, high-support categories but under-represents the nuanced, low-frequency subtypes—often collapsing them into the dominant classes.
