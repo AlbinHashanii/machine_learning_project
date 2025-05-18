@@ -39,7 +39,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 X_train_res, y_train_res = apply_smote(X_train, y_train)
 
 models_dict = {
-    "TabNet": train_tabnet(X_train_res, y_train_res),
     "Naive Bayes": train_naive_bayes(X_train_res, y_train_res),
     "Linear Regression": train_linear_regression(X_train_res, y_train_res),
     "LightGBM": train_lgbm(X_train_res, y_train_res),
@@ -47,9 +46,9 @@ models_dict = {
     "CatBoost": train_catboost(X_train_res, y_train_res),
     "Random Forest": train_random_forest(X_train_res, y_train_res),
     "K‑Means": train_kmeans(X_train_res, n_clusters=len(encoders[target_column].classes_)),
-     "RNN": train_rnn(X_train_res, y_train_res),
-     "DBN": train_dbn(X_train_res, y_train_res),
-    "ExtraTrees": train_extra_trees(X_train_res, y_train_res)
+    "RNN": train_rnn(X_train_res, y_train_res),
+    "ExtraTrees": train_extra_trees(X_train_res, y_train_res),
+    "DNN": train_dense_nn(X_train_res, y_train_res)
 }
 
 for name, model in models_dict.items():
@@ -66,14 +65,6 @@ for name, model in models_dict.items():
         evaluate_regression(y_test, preds)
         plot_regression_scatter(y_test, preds)
 
-    if name == "DBN":
-        X_test_arr = X_test.values
-        probs = model.predict(X_test_arr)
-        preds = np.argmax(probs, axis=1)
-        evaluate_classification(y_test, preds)
-        plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, title="DBN Accuracy by Class")
-        plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, title="DBN Confusion Matrix")
-
     elif name == "ExtraTrees":
         preds = model.predict(X_test)
 
@@ -82,17 +73,13 @@ for name, model in models_dict.items():
         plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, name + " Confusion Matrix")
 
     elif name == "RNN":
-        # prepare test set the same way
         X_test_arr = X_test.values
         X_test_seq = X_test_arr.reshape((X_test_arr.shape[0], X_test_arr.shape[1], 1))
-        # predict probabilities, then class
         probs = model.predict(X_test_seq)
         preds = np.argmax(probs, axis=1)
 
-        # prints precision, recall, f1, accuracy
         evaluate_classification(y_test, preds)
 
-        # visualize per-class accuracy and confusion
         plot_per_class_accuracy(
             y_test, preds,
             encoders[target_column].classes_,
@@ -104,20 +91,19 @@ for name, model in models_dict.items():
             title="RNN Confusion Matrix"
         )
 
+    elif name == "DNN":
+        model, scaler = train_dense_nn(X_train, y_train)
+        X_test_arr = scaler.transform(X_test.values.astype("float32"))
+        probs = model.predict(X_test_arr)
+        preds = np.argmax(probs, axis=1)
+
     elif name in ["LightGBM", "XGBoost", "CatBoost"]:
         preds_class = model.predict(X_test)
 
         evaluate_classification(y_test, preds_class)
         plot_per_class_accuracy(y_test, preds_class, encoders[target_column].classes_, name)
         plot_confusion_matrix_percent(y_test, preds_class, encoders[target_column].classes_, name + " Confusion Matrix")
-    elif name == "TabNet":
-        X_test_np = X_test.values.astype("float32")
-        preds_class = model.predict(X_test_np)
-        preds = preds_class.reshape(-1)
 
-        evaluate_classification(y_test, preds)
-        plot_per_class_accuracy(y_test, preds, encoders[target_column].classes_, name)
-        plot_confusion_matrix_percent(y_test, preds, encoders[target_column].classes_, name + " Confusion Matrix")
     else:
         preds = model.predict(X_test)
         evaluate_classification(y_test, preds)
