@@ -308,6 +308,115 @@ So the “best” choice here is 3 clusters—that’s where we achieve the lowe
 
   ![Project Logo](images/k-means-evaluation.png)
 
+## Third Phase
+In the third phase of our workflow, we expanded beyond traditional baselines by implementing a diverse set of both tree-based and neural approaches. We trained four ensemble learners: XGBoost, LightGBM, CatBoost and Extra Trees, to harness gradient-boosting and random-forest strategies, while also developing a recurrent neural network (RNN) to capture potential temporal or sequential patterns and a deep neural network (DNN) to learn complex, hierarchical feature representations.
+
+## XGBoost Classifier
+Overall, the XGBoost model’s per-class accuracies with the 77.4% overall accuracy reveal a mix of very well-separated categories and a few that remain challenging:
+
+Perfect or near-perfect performance: 
+- 100% accuracy on “Bashkësi Fetare,” “Komp.pub e kufizuar,”, "Kompani e huaj" and the final category  “Zyrë ndërkombëtare”, showing these classes are almost trivially distinguished by the model.
+
+- 98.7% on “Person fizik” and 95.1% on “Tjetër,” meaning nearly every example of those types was classified correctly.
+
+- 93.5% on “Kooperativa Bujqësore”and 90.0% on two other categories, again well above average.
+
+Strong but not perfect: Several classes landed in the 85–88% range.
+
+Struggling categories: 
+- “Shoqëri Komandite” (~40.9%) is the weakest link, with less than half of its samples correctly labelled.
+
+A 77.4 % overall accuracy for XGBoost in a multi-class setting with over twenty categories is a solid result—especially when you consider that nearly half of your classes achieve 90–100 % accuracy, demonstrating that the model very reliably separates the most distinctive groups. At the same time, the dip below 60 % on some specialized corporate-entity types shows there’s clear room to improve class balance or feature representation for those confusing cases.  
+
+![Project Logo](images/xgboost-3.png)
+
+The confusion matrix confirms that XGBoost nails the big, common categories but struggles with the rarer, closely related entity types. On the diagonal you can see huge counts for “Individual” (5212 correct) and “SH.P.K.” (4982), with only a few hundred spill-overs into other classes—evidence that the model has learned those distributions really well. By contrast, low-support classes like “Konsorcium,” “Degë e Shoqërisë së Huaj” and “Shoqëri Komandite” show lots of off-diagonal entries, often being mistaken for SH.P.K. or even “Individual.”
+
+![Project Logo](images/xgboost-cm-3.png)
+
+## LightGBM Classifier
+LightGBM delivers an overall accuracy of 76.5 %, echoing XGBoost’s strength on the most distinctive classes but with slightly more variance.
+
+- It hits 100 % on “Bashkësi Fetare,” “Komp.pub e kufizuar,” “Kompani e huaj,” and “Zyrë ndërkombëtare,” and nearly perfect scores on “Person fizik” (99.2 %) and “Tjetër” (96.7 %), showing it cleanly separates those labels.
+
+- Strong performers also include “OJQ” (85.6 %) and “Kooperativa” (85.7 %), both well above the mean.
+
+However, LightGBM struggles on a handful of low-support or ambiguous corporate types—“Degë e Shoqërisë së Huaj” (44.8 %), “Projekt” (50.0 %), “Shoqëri Komandite” (40.9 %) and “Konsorcium” (58.9 %).
+
+In short, it excels on the high-frequency, clearly defined categories but, like XGBoost, could benefit from extra data or targeted feature engineering for those confusing entity subtypes.
+
+![Project Logo](images/lightgbm-3.png)
+
+The LightGBM confusion matrix makes it clear that the model excels on the large, distinctive categories: 
+- “Individual” (5172 correct), “SH.P.K.” (4046), and “Ortakëria e përgjithshme” (1060) all show very strong diagonal counts—while the smaller, nuanced classes bleed into those big buckets.  In short, LightGBM reliably captures the core distributions but still struggles to distinguish under-represented, closely related entity subtypes.
+
+![Project Logo](images/lightgbm-cm-3.png)
+
+## ExtraTrees
+
+ExtraTrees achieves a solid 76.9 % overall accuracy, mirroring the patterns we saw with XGBoost and LightGBM: the most distinctive, high-frequency classes hit the ceiling—religious communities, foreign government agencies, individuals, insurance companies, cooperatives, general partnerships, and SH.P.K. all score 96 – 100 %, while a broad middle tier (public enterprises, limited partnerships, joint-stock offices, even budget organizations) sits comfortably in the 75 – 85 % range.
+
+The real trouble spots remain the rare or highly similar corporate forms: “Konsorcium” at just 26.7 %, “Nderrmarje shoq.” at 49.8 %, “Projekt” at 54.7 %, and foreign-branch or subsidiary labels in the low 60 % range. In short, ExtraTrees flawlessly separates the big winners but—like the gradient-boosters—struggles on under-represented, nuanced entity types.
+
+![Project Logo](images/extratrees.png)
+
+The ExtraTrees confusion matrix makes it clear that the model virtually masters the high-volume, distinctive classes:
+- “Individual” (5152 correct), “SH.P.K.” (5418), “Ortakëria e përgjithshme” (977) and “Shoqëri akcionare” (803) all sit strongly on the diagonal with minimal spillover. In contrast, the low-support corporate types like “Konsorcium,” “Degë e Shoqërisë së Huaj,” and “Shoqëri Komandite” are scattered across neighbouring labels, often falling into SH.P.K. or Individual.
+
+![Project Logo](images/extratrees-cm.png)
+
+## CatBoost
+CatBoost settles at a 74.0 % overall accuracy, striking a similar balance of rock-solid winners and weaker fringe categories. It achieves 100 % on the most distinctive labels. 
+- It scores exceptionally well on "Kooperativa" (96.8 %),"OJQ" (86.6 %) and "Organizata Buxhetore"(89.5 %).
+- Some columns still trail behind, indicating that CatBoost, like its peers, excels on high-volume, distinctive categories but fumbles the rarer, nuanced subtypes.
+
+![Project Logo](images/catboost-3.png)
+
+The CatBoost confusion matrix tells much the same story as the other tree-based learners: it virtually “perfects” the high-volume, distinctive labels:  
+-  “Individual” (~4880 correct), “SH.P.K.” (~4660) and “Ortakëria e përgjithshme” (~1043)—with only a handful of spill-overs into other classes. Mid-frequency types like “Kompani e huaj” (~712) and public enterprises fare decently but still leak into each other. Meanwhile the rare, nuanced legal forms (e.g. “Konsorcium,” “Degë e Shoqërisë së Huaj,” “Shoqëri Komandite”) are scattered across those big buckets, often mis-labeled as SH.P.K. or Individual. In short, CatBoost captures the dominant patterns superbly but, like its peers, struggles to distinguish under-represented, closely related subtypes.
+
+![Project Logo](images/catboost-cm-3.png)
+
+## RNN -  Recurrent Neural Network
+
+The RNN’s 44.9 % overall accuracy tells the story of a model that’s still under-trained after just two epochs. 
+- On the bright side, it “locks in” a handful of highly distinctive labels—“Bashkësi Fetare,” “Komp.pub e kufizuar,” “Kompani e huaj,” “Ortakëria e kufizuar,” and “Tjetër” all hit 100 %, and “Ortakeri e kufizuar” even reaches 97.4 %—but most classes languish well below the mean.
+
+![Project Logo](images/rnn-2.png)
+
+After extending training, the RNN’s overall accuracy jumps to 69.0 %, and it now “locks in” many of the previously elusive classes. 
+ - Highly distinctive labels like "Bashkësi Fetare", "Agjension i huaj qeveritar", "Komp.pub e kufizuar", "Kompani sigurimi", "Organizata Buxhetore", "Ortakëria e kufizuar", "Tjetër".
+ - Meanwhile, "Zyrë e Përfaqësisë në Kosovë" hits 0%.
+
+ ![Project Logo](images/rnn-20.png)
+
+ With a 72.3 % overall accuracy, the RNN has clearly digested more signal: it now “locks in” ten of the 26 classes at or above 80 %.
+ -  “Zyra e Përfaqësisë në Kosovë” (0 %) remain under-represented—indicating you’ll need more examples or richer features to master those edge cases.
+
+ ![Project Logo](images/rnn-40.png)
+
+## DNN - Deep Neural Network 
+
+After 100 epochs the DNN settles at just 48.5 % overall accuracy, showing that it still hasn’t captured the full complexity of the 26-class problem. On the bright side, it “locks in” a handful of very distinctive groups—several classes hit 100 %:
+-   For example: "Bashkësi Fetare", "Komp.pub e kufizuar", "Agjensioni i huaj qeveritar", "Kooperativa","Kompani sigurimi", "Organizata Buxhetore", "Shoqeria Komandite”, "Zyrë ndërkombëtare".
+- In short, the DNN clearly memorizes the “easy” buckets but underfits the many mid- and low-support classes; it likely needs more data per class, stronger regularization, or architectural tweaks (e.g. attention, deeper layers) to push beyond the sub-50 % regime.
+
+ ![Project Logo](images/dnn-100-epoka.png)
+
+After pushing the DNN further, it edges up to 50.4 % overall accuracy—still modest, but with clearer strengths and weaknesses.
+- Again from the picture, we can clearly see that DNN decreased the 100% in some columns that were predicted 100% by the DNN with 100 epochs, but increased the ones with lower percentage. 
+
+![Project Logo](images/dnn-200-epoka.png)
+
+After training to convergence, the DNN edges up to 57.5 % overall accuracy, but the pattern remains the same: it perfectly “memorizes” the most distinctive labels while still under-performing on mid- and low-frequency classes.
+
+![Project Logo](images/dnn-300-epoka.png)
+
+The DNN’s confusion matrix makes it clear that it perfectly “memorizes” the high-volume classes: 3947 out of 4712 true "Individuals" and 2857 SH.P.K. entries sit neatly on the diagonal. 
+-  In short, the network excels on the most distinctive, high-support categories but under-represents the nuanced, low-frequency subtypes—often collapsing them into the dominant classes.
+
+![Project Logo](images/dnn-cm-300.png)
+  
 
 ### License
 
